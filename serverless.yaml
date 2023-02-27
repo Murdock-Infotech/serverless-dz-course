@@ -1,0 +1,69 @@
+service: django-aws-lambda
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-prune-plugin
+  - serverless-python-requirements
+  - serverless-wsgi
+useDotenv: true
+
+custom:
+  dotenv:
+    logging: false
+  pythonRequirements:
+    dockerizePip: non-linux
+    zip: true
+    fileName: requirements.txt
+  stage: dev
+  wsgi:
+    app: django_aws_lambda.wsgi.application
+    packRequirements: false
+  prune:
+    automatic: true
+    number: 3
+
+functions:
+  - app:
+      handler: wsgi_handler.handler
+      events:
+        - http: ANY /
+        - http: ANY /{proxy+}
+      timeout: 30
+
+provider:
+  name: aws
+  role: arn:aws:iam::<role_id>:role/<role_name>
+  profile: zappa # make sure that you configured aws profile using `aws configure --profile <your-profile-name>`
+  region: us-east-1
+  runtime: python3.8
+  versionFunctions: false
+  stage: dev
+  timeout: 60
+  vpc:
+    securityGroupIds:
+      - sg-09c4a15e7cc9945ac
+    subnetIds:
+      - subnet-08b06a4b0dbcae6da
+      - subnet-0ac4775060646a4b7
+      - subnet-027aef6efa468fcaf
+      - subnet-092939c4bcb65acb6
+      - subnet-001dbdeeb324371ef
+      - subnet-0be5ecac442b12d66
+  deploymentBucket:
+    name: zappa-sabfx3p1a
+  apiGateway:
+    shouldStartNameWithService: true
+  lambdaHashingVersion: 20201221
+
+package:
+  individually:
+    true
+  exclude:
+    - .env
+    - .git/**
+    - .github/**
+    - .serverless/**
+    - static/**
+    - .cache/**
+    - .pytest_cache/**
+    - node_modules/**
