@@ -32,7 +32,7 @@ functions:
 
 provider:
   name: aws
-  role: arn:aws:iam::<role_id>:role/<role_name>
+  # role: arn:aws:iam::<role_id>:role/<role_name>
   profile: zappa # make sure that you configured aws profile using `aws configure --profile <your-profile-name>`
   region: us-east-1
   runtime: python3.8
